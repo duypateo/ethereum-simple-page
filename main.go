@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/duypateo/ethereum-simple-page/etherscan"
 	"github.com/duypateo/ethereum-simple-page/renderer"
+	"github.com/duypateo/ethereum-simple-page/database"
 	"log"
 	"net/http"
 	"os"
@@ -69,6 +70,20 @@ func main() {
 		port = "8080"
 	}
 	port = ":" + port
+
+	err := database.InitConnection()
+	if err != nil {
+		log.Println(err)
+		log.Fatal(err)
+	}
+
+	defer database.DB.Close()
+
+	// isInserted := database.InsertToHistory("0x52bc44d5378309EE2abF1539BF71dE1b7d7bE3b5")
+	// log.Println(isInserted)
+
+	// histories := database.GetHistories()
+	// log.Println(histories)
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/check", checkHandler)
