@@ -1,8 +1,8 @@
 package main
 
 import (
-	"ethereum-simple-page/etherscan"
-	"ethereum-simple-page/renderer"
+	"github.com/duypateo/ethereum-simple-page/etherscan"
+	"github.com/duypateo/ethereum-simple-page/renderer"
 	"log"
 	"net/http"
 )
