@@ -5,6 +5,8 @@ import (
 	"github.com/duypateo/ethereum-simple-page/renderer"
 	"log"
 	"net/http"
+	"os"
+	_ "github.com/heroku/x/hmetrics/onload"
 )
 
 // Index page
@@ -62,9 +64,15 @@ func checkHandler(w http.ResponseWriter, r *http.Request) {
 
 // main
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	port = ":" + port
+
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/check", checkHandler)
 
-	serverErr := http.ListenAndServe(":8080", nil)
+	serverErr := http.ListenAndServe(port, nil)
 	log.Fatal(serverErr)
 }
