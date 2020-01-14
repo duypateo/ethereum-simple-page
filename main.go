@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./etherscan"
-	"./renderer"
+	"ethereum-simple-page/etherscan"
+	"ethereum-simple-page/renderer"
 	"log"
 	"net/http"
 )
