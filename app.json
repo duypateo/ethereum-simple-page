@@ -1,0 +1,12 @@
+{
+  "name": "Start on Heroku: Go",
+  "description": "Go Getting Started Example App",
+  "keywords": [
+    "ethereum-simple-page",
+    "go",
+    "sample",
+    "example"
+  ],
+  "website": "http://github.com/duypateo/ethereum-simple-page",
+  "repository": "http://github.com/duypateo/ethereum-simple-page"
+}

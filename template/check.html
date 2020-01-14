@@ -1,0 +1,55 @@
+{{define "content"}}
+
+<div class="container">
+    <div class="row">
+        <div class="column">
+            <h3>Address <code>{{ .Address }}</code></h3>
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <h4>Balance:</h4>
+            {{ if eq .BalanceResp.Status "1" }}
+                <p>Your account balance: <b>{{ .BalanceResp.Result }} Ether</b></p>
+            {{ else }}
+                <blockquote class="error">
+                    <p><em>{{ .BalanceResp.Result }}</em></p>
+                </blockquote>
+            {{ end }}
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="column">
+            <h4>Latest blocks:</h4>
+            {{ if eq .BlockResp.Status "1" }}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Block Number</th>
+                            <th>Block Reward</th>
+                            <th>Date time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range $block := .BlockResp.Result }}
+                        <tr>
+                            <td>{{ $block.blockNumber }}</td>
+                            <td>{{ $block.blockReward }}</td>
+                            <td>{{ convertToDatetime $block.timeStamp }}</td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                  </table>
+                  
+            {{ else }}
+                <blockquote class="error">
+                    <p><em>{{ .BlockResp.Message }}</em></p>
+                </blockquote>
+            {{ end }}
+        </div>
+    </div>
+</div>
+
+{{end}}
