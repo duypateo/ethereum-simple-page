@@ -26,7 +26,7 @@ type History struct {
 
 // InitConnection - connect db
 func InitConnection() error {
-	conString := os.Getenv("CLEARDB_DATABASE_URL")
+	conString := os.Getenv("DATABASE_URL")
 	if conString == "" {
 		conString = username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
 	}
