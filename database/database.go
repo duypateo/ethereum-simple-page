@@ -2,28 +2,29 @@ package database
 
 import (
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
-	driver = "mysql"
+	driver   = "mysql"
 	username = "root"
 	password = "root"
-	port = "3306"
-	host = "127.0.0.1"
-	schema = "ethereum"
+	port     = "3306"
+	host     = "127.0.0.1"
+	schema   = "ethereum"
 	// DB - for db instance
 	DB *sql.DB
 )
 
 // History represent for table history in database
 type History struct {
-	address string
-	datetime string
+	Address  string `db:"address"`
+	Datetime string `db:"datetime"`
 }
 
 // InitConnection - connect db
-func InitConnection() (error) {
+func InitConnection() error {
 	conString := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
 	var err error
 	DB, err = sql.Open(driver, conString)
@@ -63,10 +64,10 @@ func UpdateToHistory(addr string) bool {
 }
 
 // GetHistories - get history record from db
-func GetHistories() []History{
+func GetHistories() []History {
 	var histories []History
 
-	selectQuery := `SELECT address, datetime FROM histories`
+	selectQuery := `SELECT address, datetime FROM histories ORDER BY datetime DESC`
 	rows, err := DB.Query(selectQuery)
 	if err != nil {
 		panic(err)
@@ -76,7 +77,7 @@ func GetHistories() []History{
 
 	for rows.Next() {
 		history := History{}
-		err = rows.Scan(&history.address, &history.datetime)
+		err = rows.Scan(&history.Address, &history.Datetime)
 		if err != nil {
 			panic(err)
 		}
@@ -95,7 +96,7 @@ func GetHistories() []History{
 func IsExistAddress(addr string) bool {
 	var address string
 
-	sqlStatement := "SELECT address FROM histories WHERE address='"+addr+"'"
+	sqlStatement := "SELECT address FROM histories WHERE address='" + addr + "'"
 	row := DB.QueryRow(sqlStatement)
 
 	err := row.Scan(&address)
@@ -110,7 +111,7 @@ func IsExistAddress(addr string) bool {
 func IsExist(addr string) error {
 	var address string
 
-	sqlStatement := "SELECT address FROM histories WHERE address='"+addr+"'"
+	sqlStatement := "SELECT address FROM histories WHERE address='" + addr + "'"
 	row := DB.QueryRow(sqlStatement)
 
 	err := row.Scan(&address)

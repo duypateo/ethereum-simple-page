@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/duypateo/ethereum-simple-page/etherscan"
-	"github.com/duypateo/ethereum-simple-page/renderer"
-	"github.com/duypateo/ethereum-simple-page/database"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/duypateo/ethereum-simple-page/database"
+	"github.com/duypateo/ethereum-simple-page/etherscan"
+	"github.com/duypateo/ethereum-simple-page/renderer"
 	_ "github.com/heroku/x/hmetrics/onload"
 )
 
@@ -29,6 +30,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		pageData["Address"] = addrKeys[0]
 	}
 
+	pageData["recentAddrs"] = database.GetHistories()
+	log.Println(pageData["recentAddrs"])
+
 	// testing line
 	renderer.RenderTemplate(w, "index", pageData)
 }
@@ -39,7 +43,13 @@ func checkHandler(w http.ResponseWriter, r *http.Request) {
 		"Title": "Your Ethereum balance snapshot",
 	}
 
-	address := r.FormValue("ether_address")
+	addressFound, ok := r.URL.Query()["ether_address"]
+	if !ok || len(addressFound[0]) == 0 {
+		http.Redirect(w, r, "index", http.StatusFound)
+		return
+	}
+
+	address := addressFound[0]
 	if !etherscan.IsValidAddress(address) {
 		http.Redirect(w, r, "index?invalid=true&address="+address, http.StatusFound)
 		return
@@ -47,6 +57,9 @@ func checkHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(address)
 	pageData["Address"] = address
+
+	// save or update to db
+	database.InsertToHistory(address)
 
 	balanceResp, err := etherscan.GetBalanceByAddress(address)
 	log.Println(balanceResp)
@@ -78,12 +91,6 @@ func main() {
 	}
 
 	defer database.DB.Close()
-
-	// isInserted := database.InsertToHistory("0x52bc44d5378309EE2abF1539BF71dE1b7d7bE3b5")
-	// log.Println(isInserted)
-
-	// histories := database.GetHistories()
-	// log.Println(histories)
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/check", checkHandler)
