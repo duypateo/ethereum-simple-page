@@ -2,6 +2,7 @@ package renderer
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 	"text/template"
 	"time"
@@ -21,8 +22,7 @@ var functionMap = template.FuncMap{
 	"convertToDatetime": func(timestamp string) string {
 		if timestampInt, err := strconv.ParseInt(timestamp, 10, 64); err == nil {
 			unixTime := time.Unix(timestampInt, 0)
-			// time, _ := time.Parse("2017-08-31 00:00:00 +0000 UTC", unixTime)
-			return unixTime.Format("2 Jan 2006 15:04:05")
+			return unixTime.Format("2006-01-02 15:04:05")
 		}
 		return "failed"
 	},
@@ -41,5 +41,13 @@ func RenderTemplate(w http.ResponseWriter, tmplName string, pageData map[string]
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	pageData["Timezone"] = "Asia/Ho_Chi_Minh"
+
+	configTz := os.Getenv("TZ")
+	if configTz != "" {
+		pageData["Timezone"] = configTz
+	}
+
 	_ = tmpl.ExecuteTemplate(w, "base", pageData)
 }

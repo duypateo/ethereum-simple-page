@@ -60,9 +60,24 @@
         </section>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.27/moment-timezone.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.27/moment-timezone-with-data-2012-2022.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/timeago.js/3.0.2/timeago.min.js"></script>
     <script>
-        timeago().render(document.querySelectorAll('.time-ago'));
+        $(document).ready(function () {
+            var currentZone = moment.tz.guess();
+            var systemZone = "{{ .Timezone }}";
+
+            $(".time-ago").each(function (index, element) {
+                var curTime = $(this).attr('datetime');
+                var timezone = moment.tz(curTime, systemZone)
+                $(this).attr('datetime', timezone.tz(currentZone).format());
+            });
+
+            timeago().render(document.querySelectorAll('.time-ago'));
+        });
     </script>
 </body>
 
