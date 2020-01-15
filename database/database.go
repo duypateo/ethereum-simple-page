@@ -77,7 +77,7 @@ func UpdateToHistory(addr string) bool {
 func GetHistories() []History {
 	var histories []History
 
-	selectQuery := `SELECT address, datetime FROM histories ORDER BY datetime DESC`
+	selectQuery := `SELECT address, datetime FROM histories ORDER BY datetime DESC LIMIT 10`
 	rows, err := DB.Query(selectQuery)
 	if err != nil {
 		panic(err)
