@@ -28,7 +28,7 @@ type History struct {
 func InitConnection() error {
 	conString := os.Getenv("CLEARDB_DATABASE_URL")
 	if conString == "" {
-		conString := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
+		conString = username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
 	}
 
 	var err error
