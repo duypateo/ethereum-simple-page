@@ -26,9 +26,14 @@ type History struct {
 
 // InitConnection - connect db
 func InitConnection() error {
-	conString := os.Getenv("DATABASE_URL")
-	if conString == "" {
-		conString = username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
+	conString := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
+
+	dbUsernamePw := os.Getenv("DATABASE_USERNAME_PW_URL")
+	dbHost := os.Getenv("DATABASE_HOST_URL")
+	dbName := os.Getenv("DATABASE_NAME_URL")
+
+	if dbUsernamePw != "" && dbHost != "" && dbName != "" {
+		conString = dbUsernamePw + "@tcp(" + dbHost + ")/" + dbName
 	}
 
 	var err error
