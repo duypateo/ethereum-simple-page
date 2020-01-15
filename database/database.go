@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -25,7 +26,11 @@ type History struct {
 
 // InitConnection - connect db
 func InitConnection() error {
-	conString := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
+	conString := os.Getenv("CLEARDB_DATABASE_URL")
+	if conString == "" {
+		conString := username + ":" + password + "@tcp(" + host + ":" + port + ")/" + schema
+	}
+
 	var err error
 	DB, err = sql.Open(driver, conString)
 	if err != nil {
