@@ -1,10 +1,15 @@
 package etherscan
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
+
+	"golang.org/x/crypto/sha3"
 )
 
 // apiKeyToken for etherscan api
@@ -70,4 +75,30 @@ func GetBlocksByAddress(addr string) (Response, error) {
 func IsValidAddress(v string) bool {
 	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
 	return re.MatchString(v)
+}
+
+// ChecksumAddress - check if address is valid
+func ChecksumAddress(address string) string {
+	address = strings.Replace(strings.ToLower(address), "0x", "", 1)
+	addressHash := hex.EncodeToString(createKeccak256([]byte(address)))
+	checksumAddress := "0x"
+	for i := 0; i < len(address); i++ {
+		// If ith character is 8 to f then make it uppercase
+		l, _ := strconv.ParseInt(string(addressHash[i]), 16, 16)
+		if l > 7 {
+			checksumAddress += strings.ToUpper(string(address[i]))
+		} else {
+			checksumAddress += string(address[i])
+		}
+	}
+	return checksumAddress
+}
+
+// Keccak256 calculates and returns the Keccak256 hash of the input data.
+func createKeccak256(data ...[]byte) []byte {
+	d := sha3.NewLegacyKeccak256()
+	for _, b := range data {
+		d.Write(b)
+	}
+	return d.Sum(nil)
 }

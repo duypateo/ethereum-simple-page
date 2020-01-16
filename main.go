@@ -14,20 +14,31 @@ import (
 // Index page
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	pageData := map[string]interface{}{
-		"Title":   "Welcome to Ethereum simple gate",
-		"IsValid": true,
-		"Address": "",
+		"Title":           "Welcome to Ethereum simple gate",
+		"IsValid":         "true",
+		"IsChecksumIssue": "false",
+		"ChecksumAddress": "",
+		"Address":         "",
 	}
 
-	validKeys, ok := r.URL.Query()["invalid"]
+	validKeys, ok := r.URL.Query()["isvalid"]
 	if ok && len(validKeys[0]) != 0 {
-		pageData["IsValid"] = false
+		pageData["IsValid"] = validKeys[0]
 	}
-	log.Printf("is valid address: %v", pageData["IsValid"])
 
 	addrKeys, ok := r.URL.Query()["address"]
 	if ok && len(addrKeys[0]) != 0 {
 		pageData["Address"] = addrKeys[0]
+	}
+
+	checksumKeys, ok := r.URL.Query()["checksum"]
+	if ok && len(validKeys[0]) != 0 {
+		pageData["IsChecksumIssue"] = checksumKeys[0]
+
+		if checksumKeys[0] == "true" {
+			address := pageData["Address"].(string)
+			pageData["ChecksumAddress"] = etherscan.ChecksumAddress(address)
+		}
 	}
 
 	pageData["recentAddrs"] = database.GetHistories()
@@ -51,7 +62,13 @@ func checkHandler(w http.ResponseWriter, r *http.Request) {
 
 	address := addressFound[0]
 	if !etherscan.IsValidAddress(address) {
-		http.Redirect(w, r, "index?invalid=true&address="+address, http.StatusFound)
+		http.Redirect(w, r, "index?isvalid=false&address="+address, http.StatusFound)
+		return
+	}
+
+	checksumAddr := etherscan.ChecksumAddress(address)
+	if checksumAddr != address {
+		http.Redirect(w, r, "index?isvalid=false&address="+address+"&checksum=true", http.StatusFound)
 		return
 	}
 
@@ -94,6 +111,8 @@ func main() {
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/check", checkHandler)
+
+	log.Println(etherscan.ChecksumAddress("0xd40800cc8b4f853eaea90b2b14b1ddda5511755b"))
 
 	serverErr := http.ListenAndServe(port, nil)
 	log.Fatal(serverErr)

@@ -9,10 +9,17 @@
                     <label for="addrField">Address</label>
                     <input name="ether_address" type="text" required placeholder="Enter you Ethereum address" id="addrField"
                         value="{{ if ne .Address "" }}{{ .Address }}{{ end }}">
-                    {{ if eq .IsValid false }}
-                    <blockquote class="error">
-                        <i>Ethereum address is invalid</i>
-                    </blockquote>
+                    {{ if eq .IsValid "false" }}
+                        {{ if eq .IsChecksumIssue "true" }}
+                        <blockquote class="error">
+                            <i>This address is not formatted properly. Please double-check each character in the address.</i><br>
+                            Are you checking for address <a href="/check?ether_address={{ .ChecksumAddress }}"><b><code>{{ .ChecksumAddress }}</code></a></b> ?
+                        </blockquote>
+                        {{ else }}
+                        <blockquote class="error">
+                            <i>Ethereum address is invalid</i>
+                        </blockquote>
+                        {{ end }}
                     {{ end }}
                     <input class="button-primary" type="submit" value="Go to check">
                 </fieldset>
